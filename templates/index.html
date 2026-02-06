@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudbeds Reservation Creator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 15px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-size: 0.85rem;
+        }
+
+        input[type="text"], input[type="password"], input[type="date"] {
+            padding: 8px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .room-types-table {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .table-header {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .room-type-row {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            border-bottom: 1px solid #e0e6ed;
+            background: white;
+        }
+
+        .room-type-row:last-child {
+            border-bottom: none;
+        }
+
+        .room-type-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .percentage-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e0e6ed;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .percentage-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.success {
+            border-left-color: #27ae60;
+        }
+
+        .result-item.error {
+            border-left-color: #e74c3c;
+        }
+
+        .result-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .result-details {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .error-list {
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+
+        .error-list li {
+            color: #e74c3c;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cloudbeds Reservation Creator</h1>
+            <p>Create bulk reservations for your property</p>
+        </div>
+
+        <div class="content">
+            <!-- Settings Section -->
+            <div class="section">
+                <h2>API Configuration</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="accessToken">Access Token:</label>
+                        <input type="password" id="accessToken" placeholder="Enter your Cloudbeds API access token">
+                    </div>
+                    <div class="form-group">
+                        <label for="propertyId">Property ID:</label>
+                        <input type="text" id="propertyId" value="6000" placeholder="Enter property ID">
+                    </div>
+                </div>
+                <button class="btn" onclick="connectAndSave()">Connect</button>
+                <div id="connectionStatus" style="margin-top: 10px;"></div>
+            </div>
+
+            <!-- Date Range Section -->
+            <div class="section">
+                <h2>Reservation Date Range</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="startDate">Start Date:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date:</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+                <button class="btn" onclick="loadRoomTypes()">Load Room Types</button>
+            </div>
+
+            <!-- Room Types Section -->
+            <div class="section">
+                <h2>Room Types & Reservation Percentages</h2>
+                <div id="roomTypesContainer" class="hidden">
+                    <div class="room-types-table">
+                        <div class="table-header">
+                            <div>Room Type Name</div>
+                            <div>Total Units</div>
+                            <div>Fill Percentage (%)</div>
+                            <div>Reservations to Create</div>
+                        </div>
+                        <div id="roomTypesList"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="createReservations()">Create Reservations</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="section hidden">
+                <h2>Reservation Creation Results</h2>
+                <div id="resultsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="messageContainer"></div>
+
+    <script>
+        let roomTypesData = [];
+
+        // Load saved settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setDefaultDates();
+        });
+
+        function setDefaultDates() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+
+            document.getElementById('startDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
+        }
+
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/get-settings');
+                const result = await response.json();
+                if (result.success && result.data) {
+                    document.getElementById('accessToken').value = result.data.access_token || '';
+                    document.getElementById('propertyId').value = result.data.property_id || '6000';
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        async function connectAndSave() {
+            console.log('connectAndSave function called');
+            const accessToken = document.getElementById('accessToken').value.trim();
+            const propertyId = document.getElementById('propertyId').value.trim();
+
+            console.log('Access token:', accessToken ? 'Present' : 'Missing');
+            console.log('Property ID:', propertyId);
+
+            if (!accessToken) {
+                showMessage('Please enter an access token', 'error');
+                return;
+            }
+
+            try {
+                // Show connecting message in dedicated area
+                showConnectionStatus('Connecting to Cloudbeds API...', 'info');
+
+                // First test the connection
+                const testResponse = await fetch(`/api/test-connection?access_token=${encodeURIComponent(accessToken)}&property_id=${encodeURIComponent(propertyId)}`);
+                const testResult = await testResponse.json();
+
+                if (!testResult.success) {
+                    showConnectionStatus('❌ Connection failed: ' + testResult.error, 'error');
+                    return;
+                }
+
+                // If connection successful, save the settings
+                const saveResponse = await fetch('/api/save-settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        access_token: accessToken,
+                        property_id: propertyId
+                    })
+                });
+
+                const saveResult = await saveResponse.json();
+                if (saveResult.success) {
+                    showConnectionStatus('✅ Connected successfully! Settings saved.', 'success');
+                } else {
+                    showConnectionStatus('⚠️ Connected but failed to save settings: ' + saveResult.error, 'error');
+                }
+            } catch (error) {
+                showConnectionStatus('❌ Connection failed: ' + error.message, 'error');
+            }
+        }
+
+        async function loadRoomTypes() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                showMessage('Please select start and end dates', 'error');
+                return;
+            }
+
+            if (new Date(startDate) >= new Date(endDate)) {
+                showMessage('End date must be after start date', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Loading room types...', 'info');
+                const response = await fetch('/api/room-types');
+                const result = await response.json();
+
+                if (result.success) {
+                    roomTypesData = result.data;
+                    displayRoomTypes();
+                    document.getElementById('roomTypesContainer').classList.remove('hidden');
+                    showMessage(`Loaded ${roomTypesData.length} room types`, 'success');
+                } else {
+                    showMessage('Error loading room types: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading room types: ' + error.message, 'error');
+            }
+        }
+
+        function displayRoomTypes() {
+            const container = document.getElementById('roomTypesList');
+            container.innerHTML = '';
+
+            roomTypesData.forEach((roomType, index) => {
+                const row = document.createElement('div');
+                row.className = 'room-type-row';
+                row.innerHTML = `
+                    <div class="room-type-name">${roomType.roomTypeName}</div>
+                    <div>${roomType.roomTypeUnits}</div>
+                    <div>
+                        <input type="number" 
+                               class="percentage-input" 
+                               id="percentage_${index}"
+                               min="0" 
+                               max="100" 
+                               value="0"
+                               onchange="updateReservationCount(${index})">
+                    </div>
+                    <div id="reservationCount_${index}">0</div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateReservationCount(index) {
+            const percentage = parseFloat(document.getElementById(`percentage_${index}`).value) || 0;
+            const units = roomTypesData[index].roomTypeUnits;
+            const reservationCount = Math.max(1, Math.floor((percentage / 100) * units));
+            
+            document.getElementById(`reservationCount_${index}`).textContent = 
+                percentage > 0 ? reservationCount : 0;
+        }
+
+        async function createReservations() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                showMessage('Please select start and end dates', 'error');
+                return;
+            }
+
+            // Collect room type configurations
+            const roomTypeConfigs = [];
+            roomTypesData.forEach((roomType, index) => {
+                const percentage = parseFloat(document.getElementById(`percentage_${index}`).value) || 0;
+                if (percentage > 0) {
+                    roomTypeConfigs.push({
+                        roomTypeID: roomType.roomTypeID,
+                        roomTypeName: roomType.roomTypeName,
+                        roomTypeUnits: roomType.roomTypeUnits,
+                        percentage: percentage
+                    });
+                }
+            });
+
+            if (roomTypeConfigs.length === 0) {
+                showMessage('Please set at least one percentage greater than 0', 'error');
+                return;
+            }
+
+            try {
+                showMessage('Creating reservations...', 'info');
+                
+                const response = await fetch('/api/create-reservations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        roomTypeConfigs: roomTypeConfigs,
+                        startDate: startDate,
+                        endDate: endDate
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.data);
+                    showMessage(`Reservations created! Total: ${result.data.summary.total_created}, Errors: ${result.data.summary.total_errors}`, 'success');
+                } else {
+                    showMessage('Error creating reservations: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error creating reservations: ' + error.message, 'error');
+            }
+        }
+
+        function displayResults(data) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+
+            // Summary
+            const summary = document.createElement('div');
+            summary.className = 'result-item';
+            summary.innerHTML = `
+                <div class="result-header">Summary</div>
+                <div class="result-details">
+                    Total Reservations Created: <strong>${data.summary.total_created}</strong><br>
+                    Total Errors: <strong>${data.summary.total_errors}</strong>
+                </div>
+            `;
+            container.appendChild(summary);
+
+            // Individual room type results
+            data.results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = `result-item ${result.errors.length === 0 ? 'success' : 'error'}`;
+                
+                let errorsList = '';
+                if (result.errors.length > 0) {
+                    errorsList = `
+                        <ul class="error-list">
+                            ${result.errors.map(error => `<li>${error}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+
+                resultItem.innerHTML = `
+                    <div class="result-header">${result.roomTypeName}</div>
+                    <div class="result-details">
+                        Requested: ${result.requested} | Created: ${result.created}
+                        ${errorsList}
+                    </div>
+                `;
+                container.appendChild(resultItem);
+            });
+
+            document.getElementById('resultsSection').classList.remove('hidden');
+        }
+
+        function showConnectionStatus(message, type) {
+            const container = document.getElementById('connectionStatus');
+            
+            if (!container) {
+                console.error('connectionStatus container not found!');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            const alert = document.createElement('div');
+            let alertClass = 'alert-success';
+            if (type === 'error') alertClass = 'alert-error';
+            else if (type === 'info') alertClass = 'alert-success';
+            
+            alert.className = `alert ${alertClass}`;
+            alert.style.padding = '8px 12px';
+            alert.style.fontSize = '0.8rem';
+            alert.textContent = message;
+            
+            container.appendChild(alert);
+            
+            // Auto-remove after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (container.contains(alert)) {
+                        container.removeChild(alert);
+                    }
+                }, 5000);
+            }
+        }
+
+        function showMessage(message, type) {
+            console.log('showMessage called:', message, type);
+            const container = document.getElementById('messageContainer');
+            
+            if (!container) {
+                console.error('messageContainer not found!');
+                alert(message); // Fallback to browser alert
+                return;
+            }
+            
+            // Remove existing messages
+            container.innerHTML = '';
+            
+            const alert = document.createElement('div');
+            let alertClass = 'alert-success'; // default
+            if (type === 'error') alertClass = 'alert-error';
+            else if (type === 'info') alertClass = 'alert-success'; // Use success style for info
+            
+            alert.className = `alert ${alertClass}`;
+            alert.textContent = message;
+            
+            container.appendChild(alert);
+            
+            // Auto-remove after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (container.contains(alert)) {
+                        container.removeChild(alert);
+                    }
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
