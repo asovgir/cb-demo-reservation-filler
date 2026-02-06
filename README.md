@@ -11,137 +11,38 @@ A web application for creating bulk reservations in Cloudbeds properties. Set cu
   - Room units available
   - Date range
   - Target occupancy percentage
-  - Average stay length (configurable)
+  - Average stay length (uniform 1-7 nights = 4 nights average)
 - **Progress Tracking**: Real-time console logging with detailed progress updates
 - **Error Resilience**: Continues creating reservations even if individual ones fail
 - **Rate Limiting Protection**: Built-in delays to prevent API rate limiting
 
-## Deployment Options
+## Installation & Setup
 
-### Option 1: Deploy to Render (Recommended - Free Tier Available)
-
-1. **Create a Render account** at https://render.com
-
-2. **Create a new Web Service**:
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository (or deploy from this directory)
-   - Configure the service:
-     - **Name**: `cloudbeds-reservation-creator`
-     - **Environment**: `Python 3`
-     - **Build Command**: `pip install -r requirements.txt`
-     - **Start Command**: `gunicorn main:app --timeout 3600 --workers 2 --threads 4 --worker-class gthread`
-     - **Instance Type**: `Free` (or higher for better performance)
-
-3. **Set Environment Variables**:
-   - Go to "Environment" tab
-   - Add:
-     - `FLASK_ENV` = `production`
-     - `SECRET_KEY` = `your-random-secret-key-here` (generate a random string)
-     - `PYTHON_VERSION` = `3.11.7`
-
-4. **Deploy**: Click "Create Web Service" and wait for deployment to complete
-
-5. **Access your app** at the URL provided by Render (e.g., `https://your-app-name.onrender.com`)
-
-### Option 2: Deploy to Heroku
-
-1. **Install Heroku CLI** from https://devcenter.heroku.com/articles/heroku-cli
-
-2. **Login to Heroku**:
+1. **Clone the repository**:
    ```bash
-   heroku login
+   git clone https://github.com/asovgir/cb-demo-reservation-filler.git
+   cd cb-demo-reservation-filler
    ```
 
-3. **Create a new Heroku app**:
-   ```bash
-   heroku create your-app-name
-   ```
-
-4. **Set environment variables**:
-   ```bash
-   heroku config:set FLASK_ENV=production
-   heroku config:set SECRET_KEY=your-random-secret-key-here
-   ```
-
-5. **Deploy**:
-   ```bash
-   git push heroku main
-   ```
-   (or `git push heroku master` if your branch is named master)
-
-6. **Open your app**:
-   ```bash
-   heroku open
-   ```
-
-### Option 3: Deploy to Railway
-
-1. **Create a Railway account** at https://railway.app
-
-2. **Create a new project**:
-   - Click "New Project" → "Deploy from GitHub repo"
-   - Select your repository
-
-3. **Railway will automatically detect** the Python app and deploy it
-
-4. **Set Environment Variables**:
-   - Go to your project → "Variables" tab
-   - Add:
-     - `FLASK_ENV` = `production`
-     - `SECRET_KEY` = `your-random-secret-key-here`
-
-5. **Access your app** at the URL provided by Railway
-
-### Option 4: Deploy to Google Cloud Run
-
-1. **Install Google Cloud SDK** from https://cloud.google.com/sdk/docs/install
-
-2. **Create a Dockerfile** (if not already present):
-   ```dockerfile
-   FROM python:3.11-slim
-   WORKDIR /app
-   COPY requirements.txt .
-   RUN pip install --no-cache-dir -r requirements.txt
-   COPY . .
-   ENV PORT=8080
-   ENV FLASK_ENV=production
-   CMD exec gunicorn main:app --bind :$PORT --timeout 3600 --workers 2 --threads 4 --worker-class gthread
-   ```
-
-3. **Deploy to Cloud Run**:
-   ```bash
-   gcloud run deploy cloudbeds-creator --source . --region us-central1 --allow-unauthenticated
-   ```
-
-## Local Development
-
-1. **Install dependencies**:
+2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run the application**:
+3. **Run the application**:
    ```bash
    python main.py
    ```
 
-3. **Access the app** at http://localhost:5000
+4. **Access the app** at http://localhost:5000
 
 ## Configuration
-
-### Environment Variables
-
-- `SECRET_KEY`: Secret key for Flask sessions (required in production)
-- `FLASK_ENV`: Set to `production` in production environments
-- `PORT`: Port to run the application on (auto-detected from hosting platform)
-
-### Application Settings
 
 The app uses browser sessions to store your Cloudbeds API credentials:
 - **Access Token**: Your Cloudbeds API access token
 - **Property ID**: Your property ID (default: 6000)
 
-These are stored securely in the session and expire after 7 days of inactivity.
+Credentials are stored securely in the session and expire after 7 days of inactivity. No credentials are saved to disk or committed to git.
 
 ## How to Use
 
@@ -197,9 +98,24 @@ The app includes a 0.3-second delay between API calls to prevent rate limiting w
 - Continues creating reservations even if individual ones fail
 - Detailed error logging and reporting
 
+## Requirements
+
+- Python 3.11 or higher
+- Cloudbeds API access token
+- Active internet connection
+
 ## Support
 
 For issues or questions about the Cloudbeds API, refer to the [Cloudbeds API Documentation](https://hotels.cloudbeds.com/api/docs/).
+
+## Security
+
+- No credentials are stored in the code
+- All sensitive data uses encrypted session storage
+- Sessions expire after 7 days of inactivity
+- Safe to commit to public repositories
+
+See `SECURITY.md` for more details.
 
 ## License
 

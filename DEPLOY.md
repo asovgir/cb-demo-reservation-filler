@@ -1,85 +1,110 @@
-# Quick Deployment Guide
+# Local Setup Guide
 
-## Fastest Way to Deploy (Render - Free)
+## Quick Start
 
-1. Go to https://render.com and sign up/login
+### Prerequisites
 
-2. Click **"New +"** → **"Web Service"**
+- Python 3.11 or higher
+- pip (Python package installer)
+- Git (optional, for cloning)
 
-3. Connect this GitHub repository (you'll need to push it to GitHub first)
+### Installation Steps
 
-4. Configure:
-   - **Name**: `cloudbeds-creator` (or your choice)
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: Leave empty (will use Procfile)
-   - **Instance Type**: `Free`
+1. **Get the code**:
 
-5. Add Environment Variables:
-   - `FLASK_ENV` = `production`
-   - `SECRET_KEY` = Generate a random string (e.g., use https://randomkeygen.com/)
-
-6. Click **"Create Web Service"**
-
-7. Wait 2-3 minutes for deployment
-
-8. Access your app at the provided URL!
-
-## If You Don't Have GitHub Yet
-
-### Option A: Use GitHub (Recommended)
-
-1. Create a GitHub account at https://github.com
-2. Create a new repository
-3. Push this code:
+   If you have git:
    ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
-   git push -u origin main
+   git clone https://github.com/asovgir/cb-demo-reservation-filler.git
+   cd cb-demo-reservation-filler
    ```
-4. Follow Render steps above
 
-### Option B: Use Render's Direct Upload
+   Or download the ZIP from GitHub and extract it.
 
-1. Go to https://render.com
-2. Click **"New +"** → **"Web Service"**
-3. Choose **"Deploy an existing image from a registry"** or **"Public Git repository"**
-4. You can also zip this folder and upload directly in some cases
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Option C: Use Railway (Also Free)
+3. **Run the application**:
+   ```bash
+   python main.py
+   ```
 
-1. Go to https://railway.app
-2. Sign up with GitHub
-3. Click **"New Project"** → **"Deploy from GitHub repo"**
-4. Select your repository
-5. Railway auto-detects everything!
-6. Add environment variable `SECRET_KEY` in settings
-7. Done!
+4. **Access the app**:
+   Open your browser to http://localhost:5000
+
+## First-Time Setup
+
+When you first open the app:
+
+1. **Enter your Cloudbeds API credentials**:
+   - Access Token: Your Cloudbeds API access token
+   - Property ID: Your property ID (default is 6000)
+
+2. **Click "Connect"** to test the connection
+
+3. **Set your date range** for reservations
+
+4. **Click "Load Room Types"** to fetch your property's room types
+
+5. **Set occupancy percentages** for each room type
+
+6. **Click "Create Reservations"** and monitor progress in the console
+
+## Troubleshooting
+
+### "Module not found" errors
+Make sure you've installed all dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Port 5000 already in use
+Change the port by setting an environment variable:
+```bash
+# Windows
+set PORT=8000
+python main.py
+
+# Mac/Linux
+PORT=8000 python main.py
+```
+
+### Connection issues
+- Verify your Cloudbeds API token is valid
+- Check your internet connection
+- Ensure the property ID is correct
+
+### Reservations stopping early
+- Check the console output for specific errors
+- The app includes automatic retries for network issues
+- Rate limiting protection (0.3s delay between reservations)
+
+## Console Output
+
+The application provides detailed console logging:
+- Source ID selection and validation
+- Per-reservation progress tracking
+- Success/error status for each reservation
+- Final summary with statistics
+- Stay length distribution
+
+Keep the console window open to monitor the reservation creation process.
+
+## Stopping the Application
+
+To stop the server:
+- Press `Ctrl+C` in the terminal/console window
+- Or simply close the terminal window
+
+## Data Storage
+
+- **Credentials**: Stored in encrypted browser sessions only
+- **No local files**: Nothing is saved to your computer
+- **Session expiry**: 7 days of inactivity
+- **Safe to share**: No credentials in the code
 
 ## Need Help?
 
-- **Render Docs**: https://render.com/docs
-- **Railway Docs**: https://docs.railway.app
-- **Heroku Docs**: https://devcenter.heroku.com
-
-## Testing Locally First
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the app
-python main.py
-
-# Open browser to http://localhost:5000
-```
-
-## Important Notes
-
-- **Secret Key**: Always set a unique SECRET_KEY in production
-- **HTTPS**: Both Render and Railway provide free HTTPS
-- **Logs**: Check your platform's logs to monitor reservation creation
-- **Free Tier**: Free tiers may sleep after inactivity but wake up quickly
+- **Cloudbeds API Docs**: https://hotels.cloudbeds.com/api/docs/
+- **GitHub Issues**: https://github.com/asovgir/cb-demo-reservation-filler/issues
