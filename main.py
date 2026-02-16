@@ -363,6 +363,7 @@ def create_reservations():
         room_type_configs = data.get('roomTypeConfigs', [])
         start_date = data.get('startDate')
         end_date = data.get('endDate')
+        allotment_block_code = data.get('allotmentBlockCode')
 
         if not start_date or not end_date:
             return jsonify({'success': False, 'error': 'Start date and end date are required'})
@@ -499,6 +500,9 @@ def create_reservations():
                         'adults': json.dumps([{"quantity": 1, "roomTypeID": room_type_id}]),
                         'children': json.dumps([{"roomTypeID": room_type_id, "quantity": 0}])
                     }
+
+                    if allotment_block_code:
+                        reservation_data['allotmentBlockCode'] = allotment_block_code
 
                     # Make API call to create reservation
                     print(f"→ Creating reservation for {first_name} {last_name}", flush=True)

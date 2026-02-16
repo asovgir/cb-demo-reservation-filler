@@ -313,6 +313,10 @@
                         <label for="endDate">End Date:</label>
                         <input type="date" id="endDate">
                     </div>
+                    <div class="form-group">
+                        <label for="allotmentBlockCode">Allotment Block Code (optional):</label>
+                        <input type="text" id="allotmentBlockCode" placeholder="Leave empty if not using allotment blocks">
+                    </div>
                 </div>
                 <button class="btn" onclick="loadRoomTypes()">Load Room Types</button>
             </div>
@@ -534,7 +538,8 @@
                     body: JSON.stringify({
                         roomTypeConfigs: roomTypeConfigs,
                         startDate: startDate,
-                        endDate: endDate
+                        endDate: endDate,
+                        allotmentBlockCode: document.getElementById('allotmentBlockCode').value.trim() || null
                     })
                 });
 
